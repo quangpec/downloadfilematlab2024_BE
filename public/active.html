@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trang Kích Hoạt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto Mono', monospace;
+      background-color: #1e1e1e;
+      color: #eaeaea;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #61dafb;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .log-console {
+      background: #111;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Roboto Mono', monospace;
+      color: #eee;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      min-height: 80px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .log-line {
+      margin: 4px 0;
+      white-space: pre-wrap;
+    }
+
+    .log-line.info {
+      color: #61dafb;
+    }
+
+    .log-line.success {
+      color: #4caf50;
+    }
+
+    .log-line.error {
+      color: #e74c3c;
+    }
+
+    .info-section {
+      margin-top: 40px;
+      background-color: #2a2a2a;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .info-section h2 {
+      color: #61dafb;
+      margin-bottom: 10px;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .info-section p {
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0 0 10px;
+      text-align: left;
+    }
+
+    .info-section a {
+      color: #4fc3f7;
+      text-decoration: none;
+      display: inline-block;
+      margin: 0 5px;
+    }
+
+    .info-section a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kích Hoạt Tải Phần Mềm</h1>
+  
+  <!-- Console log section -->
+  <div id="logConsole" class="log-console">
+    <div class="log-line">[INFO] Hệ thống đang kiểm tra thiết bị...</div>
+  </div>
+
+  <div class="info-section">
+    <h2>Giới thiệu</h2>
+    <p id="typingText"></p>
+    <p style="text-align: center;">
+      <a href="https://www.facebook.com/dev4matlab/" target="_blank">Facebook</a> 
+      <a href="https://github.com/quangpec" target="_blank">GitHub</a> 
+      <a href="https://zalo.me/0963559840" target="_blank">Zalo</a>
+    </p>
+  </div>
+
+  <footer>
+    © 2025 | Hệ thống kích hoạt bản quyền phần mềm
+  </footer>
+
+  <script>
+    const logConsole = document.getElementById('logConsole');
+
+    function logMessage(type, msg) {
+      const logLine = document.createElement('div');
+      const time = new Date().toLocaleTimeString();
+      logLine.className = `log-line ${type}`;
+      logLine.textContent = `[${time}] [${type.toUpperCase()}] ${msg}`;
+      logConsole.appendChild(logLine);
+      logConsole.scrollTop = logConsole.scrollHeight; // luôn cuộn xuống dòng mới
+    }
+
+    // Lấy thông tin thiết bị
+    function getDeviceInfo() {
+      const userAgent = navigator.userAgent;
+      const platform = navigator.platform;
+      const browser = userAgent.match(/(Chrome|Firefox|Safari|Edge|MSIE|Trident)/i) ? RegExp.$1 : "Unknown Browser";
+
+      // Lấy địa chỉ IP từ một API ngoài
+      fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+          const ip = data.ip;
+          logMessage("info", `IP: ${ip}`);
+          logMessage("info", `Trình duyệt: ${browser}`);
+          logMessage("info", `Hệ điều hành: ${platform}`);
+        })
+        .catch(err => {
+          console.error(err);
+          logMessage("error", "Không thể lấy địa chỉ IP.");
+        });
+    }
+
+    const isIphone = /iPhone/i.test(navigator.userAgent);
+
+    if (!isIphone) {
+      logMessage("error", "Chỉ chấp nhận quét và kích hoạt bằng iPhone.");
+    } else {
+      const key = new URLSearchParams(window.location.search).get('key');
+      if (!key) {
+        logMessage("error", "Không tìm thấy mã kích hoạt.");
+      } else {
+        logMessage("info", "Đang kích hoạt...");
+        
+        getDeviceInfo(); // Lấy thông tin thiết bị khi bắt đầu kích hoạt
+
+        fetch('/activate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key })
+        })
+        .then(res => res.json())
+        .then(data => {
+          const success = data.success || data.message?.includes("thành công");
+          if (success) {
+            logMessage("success", "Kích hoạt thành công, đang gửi tín hiệu...");
+          } else {
+            throw new Error(data.message || "Kích hoạt thất bại");
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          logMessage("error", "Đã xảy ra lỗi trong quá trình kích hoạt.");
+        });
+      }
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+        (e.ctrlKey && e.key === 'U')
+      ) {
+        e.preventDefault();
+        alert("Hành động bị chặn!");
+      }
+    });
+
+    const threshold = 160;
+    const checkDevTools = () => {
+      const start = new Date();
+      debugger;
+      const end = new Date();
+      if (end - start > threshold) {
+        alert("Vui lòng không mở công cụ nhà phát triển!");
+        window.location.href = "about:blank";
+      }
+    };
+    setInterval(checkDevTools, 1000);
+
+    // Typing effect
+    const typingElement = document.getElementById("typingText");
+    const text = "Tôi là lập trình viên tự do, chuyên về các dự án MATLAB, phần mềm, web, Zalo mini app, tool và ứng dụng tự động hóa.";
+    let index = 0;
+    let isDeleting = false;
+
+    function typeEffect() {
+      if (!isDeleting && index <= text.length) {
+        typingElement.textContent = text.slice(0, index++);
+      } else if (isDeleting && index >= 0) {
+        typingElement.textContent = text.slice(0, index--);
+      }
+
+      if (index > text.length) {
+        isDeleting = true;
+        setTimeout(typeEffect, 1000);
+      } else if (index < 0) {
+        isDeleting = false;
+        setTimeout(typeEffect, 1000);
+      } else {
+        setTimeout(typeEffect, isDeleting ? 40 : 60);
+      }
+    }
+
+    typeEffect();
+  </script>
+</body>
+</html>

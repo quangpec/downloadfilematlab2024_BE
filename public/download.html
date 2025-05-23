@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang Máy B</title>
+</head>
+<body>
+  <h1>Máy B: Quét mã QR và yêu cầu tải xuống</h1>
+
+  <script>
+    // Kết nối WebSocket đến server
+    const socket = new WebSocket('wss://toolzalo.io.vn:3003'); // Đảm bảo rằng URL WebSocket đúng
+
+    socket.onopen = function () {
+      console.log("Máy B đã kết nối WebSocket thành công.");
+
+      // Gửi tín hiệu yêu cầu tải xuống tới server
+      socket.send(JSON.stringify({ action: 'startDownload' }));
+    };
+
+    socket.onmessage = function (event) {
+      const message = JSON.parse(event.data);
+      console.log('Tín hiệu nhận được từ server:', message);
+
+      if (message.action === 'startDownload') {
+        // Khi nhận được tín hiệu tải xuống từ Máy A
+        console.log("Máy B nhận được tín hiệu tải xuống.");
+        window.location.href = '/download'; // Điều hướng đến trang tải xuống
+      }
+    };
+
+    socket.onerror = function (error) {
+      console.error("Lỗi WebSocket:", error);
+    };
+
+    socket.onclose = function () {
+      console.log("Máy B đã ngắt kết nối WebSocket.");
+    };
+  </script>
+</body>
+</html>

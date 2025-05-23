@@ -1,0 +1,34 @@
+# Bỏ qua file khóa bảo mật
+*.key
+*.pem
+*.crt
+*.cer
+12345678
+12345678.pub
+
+# Bỏ qua ảnh
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.webp
+
+# Bỏ qua video
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.flv
+*.wmv
+
+# Bỏ qua các thư mục thường chứa file nặng
+images/
+videos/
+media/
+uploads/
+static/
+MATLAB2024/
+SSL/
+node_modules/
